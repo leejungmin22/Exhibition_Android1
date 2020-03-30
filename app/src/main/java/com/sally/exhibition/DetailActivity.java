@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,12 +23,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class DetailActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private int seq;
     private String title, startDate, endDate, place, realmName, area, subTitle, thumbNail,
              price, contents1, contents2, url, phone, gpsX, gpsY, imgUrl, placeUrl, placeAddr;
+    private  ImageView contentImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +77,7 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
         Button lIkeBtn=findViewById(R.id.lIkeBtn);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         TextView contentsTextView=findViewById(R.id.contentsTextView);
+        contentImageView=findViewById(R.id.contentImageView);
 
         titleTextView.setText(Html.fromHtml(title));
         Glide.with(this).load(imgUrl).into(thumbNail);
@@ -81,9 +88,39 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
         phonetextView.setText(phone);
 
         mapFragment.getMapAsync(this);
-        contentsTextView.setText(Html.fromHtml(contents1));
         Log.d("content", contents1);
 
+
+
+        if(contents1!=null){
+            setContent(contents1);
+        }
+
+        if(contents2!=null){
+            setContent(contents2);
+        }
+
+
+    }
+
+    // 공연/전시 내용 출력하는 메소드
+    public void setContent(String contents){
+        StringBuilder sb=new StringBuilder();
+        //정규식을
+        String regEx = "\\b(https?):\\/\\/[A-Za-z0-9-+&@#\\/%?=~_|!:,.;]*";
+        //패턴으로 만들고
+        Pattern pattern=Pattern.compile(regEx);
+        Matcher matcher=null;
+        //패턴을 스트링과 매치시킨다.
+        matcher = pattern.matcher(contents1);
+
+        while(matcher.find()){
+            sb.append(matcher.group());
+        }
+
+
+        Glide.with(this).load(sb.toString()).into(contentImageView);
+        System.out.println("hello"+sb.toString());
     }
 
     @Override

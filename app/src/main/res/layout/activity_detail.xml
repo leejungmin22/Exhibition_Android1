@@ -36,6 +36,7 @@
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
         <LinearLayout
+            android:id="@+id/linear_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -54,8 +55,8 @@
                 android:id="@+id/thumbNail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:srcCompat="@tools:sample/avatars"
-                android:adjustViewBounds="true"/>
+                android:adjustViewBounds="true"
+                tools:srcCompat="@tools:sample/avatars" />
 
             <TextView
                 android:id="@+id/placeTextView"
@@ -131,7 +132,7 @@
                 android:id="@+id/map"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"/>
+                android:layout_height="200dp" />
 
             <TextView
                 android:id="@+id/contentsTextView"
@@ -139,6 +140,12 @@
                 android:layout_height="wrap_content"
                 android:text="줄거리"
                 android:textSize="20sp" />
+
+            <ImageView
+                android:id="@+id/contentImageView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:srcCompat="@tools:sample/avatars" />
 
             <ListView
                 android:layout_width="match_parent"
