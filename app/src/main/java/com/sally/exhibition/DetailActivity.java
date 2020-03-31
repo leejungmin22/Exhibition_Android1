@@ -2,6 +2,7 @@ package com.sally.exhibition;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.DisplayMetrics;
@@ -23,6 +24,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,39 +91,81 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
         phonetextView.setText(phone);
 
         mapFragment.getMapAsync(this);
-        Log.d("content", contents1);
+        //Log.d("content", contents1);
+
+        new SetContentTask().execute(contents1, contents2);
+
+    }
 
 
+    public class SetContentTask extends AsyncTask<String, Integer, String>{
 
-        if(contents1!=null){
-            setContent(contents1);
+        @Override
+        protected void onPostExecute(String contents) {
+            super.onPostExecute(contents);
+            Log.d("contents", contents);
+            if(contents!=null){
+                Glide.with(DetailActivity.this)
+                        .load(contents)
+                        .into(contentImageView);
+            }
+            if (contents==null){
+                contentImageView.setImageResource(R.drawable.coming_soon);
+            }
+
         }
 
-        if(contents2!=null){
-            setContent(contents2);
+        @Override
+        protected String doInBackground(String... strings) {
+            String contents1=strings[0];
+            String contents2=strings[1];
+
+            Map<String, String> map=new HashMap<>();
+
+            if(contents1!=null){
+                contents1=getContent(contents1);
+                map.put("imageUrl", contents1);
+            }
+
+            /*if(contents2!=null){
+
+            }*/
+
+
+            return contents1;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            contentImageView.setImageResource(R.drawable.loading);
         }
 
 
     }
 
-    // 공연/전시 내용 출력하는 메소드
-    public void setContent(String contents){
+    public String getContent(String contents){
         StringBuilder sb=new StringBuilder();
         //정규식을
-        String regEx = "\\b(https?):\\/\\/[A-Za-z0-9-+&@#\\/%?=~_|!:,.;]*";
+        String imgUrlCheck = "\\b(https?):\\/\\/[A-Za-z0-9-+&@#\\/%?=~_|!:,.;]*";
+        String tagCheck = "\\<\\p\\>\\<br\\s\\/\\>\\<\\/\\p\\>";
         //패턴으로 만들고
-        Pattern pattern=Pattern.compile(regEx);
-        Matcher matcher=null;
-        //패턴을 스트링과 매치시킨다.
-        matcher = pattern.matcher(contents1);
+        Pattern imgUrlPattern=Pattern.compile(imgUrlCheck);
+        Pattern tagPattern=Pattern.compile(tagCheck);
+        Matcher imgUrlmatcher=imgUrlPattern.matcher(contents1);
+        Matcher tagmatcher=tagPattern.matcher(contents1);
 
-        while(matcher.find()){
-            sb.append(matcher.group());
+        if(imgUrlmatcher.matches()){
+            while(imgUrlmatcher.find()){
+                sb.append(imgUrlmatcher.group());
+            }
+            return sb.toString();
         }
 
+        if (tagmatcher.matches()){
+            return null;
+        }
 
-        Glide.with(this).load(sb.toString()).into(contentImageView);
-        System.out.println("hello"+sb.toString());
     }
 
     @Override
